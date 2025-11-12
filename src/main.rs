@@ -60,7 +60,8 @@ async fn save_price(pool: &PgPool, price: &StockPrice) -> Result<(), sqlx::Error
     )
     .execute(pool)
     .await?;
-
+    Ok(())
+} 
 
 // Cycle periodique
 async fn fetch_and_save_all(pool: &PgPool, symbols: &[String]) -> Result<(), Box<dyn std::error::Error>> {
