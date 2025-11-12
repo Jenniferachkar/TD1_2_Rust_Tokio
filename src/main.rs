@@ -1,13 +1,13 @@
-use tokio::time::{sleep, Duration};
+use tokio::time::{sleep, Duration, interval};
 use rand::Rng;
-use std::time::Instant;
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use chrono::Utc;
 use serde::Deserialize;
 use dotenvy::dotenv;
 use std::env;
 use tracing::{info, error};
-use tokio::{signal, time::interval};
+use tokio::signal;
+use tracing_subscriber::EnvFilter;
 
 #[derive(Debug, Clone)]
 struct StockPrice {
@@ -18,17 +18,15 @@ struct StockPrice {
 }
 
 // Mock async fetching
-
 async fn fetch_mock_price(symbol: &str) -> f64 {
     sleep(Duration::from_millis(500)).await;
     let mut rng = rand::thread_rng();
     let price: f64 = rng.gen_range(100.0..200.0);
-    println!("the price for {} is ${:.2}", symbol, price);
+    println!("Mock price for {}: ${:.2}", symbol, price);
     price
 }
 
-//Finnhub
-
+// Finnhub API fetching
 #[derive(Deserialize)]
 struct FinnhubResponse {
     c: f64,
@@ -48,10 +46,9 @@ async fn fetch_finnhub(symbol: &str) -> Result<StockPrice, Box<dyn std::error::E
     })
 }
 
-// PostgreSQL
-
+// PostgreSQL save function
 async fn save_price(pool: &PgPool, price: &StockPrice) -> Result<(), sqlx::Error> {
-    sqlx::query!(
+    sqlx::query_unchecked!(
         r#"
         INSERT INTO stock_prices (symbol, price, source, timestamp)
         VALUES ($1, $2, $3, $4)
@@ -66,8 +63,7 @@ async fn save_price(pool: &PgPool, price: &StockPrice) -> Result<(), sqlx::Error
     Ok(())
 }
 
-//Cycle Periodique
-
+// Cycle periodique
 async fn fetch_and_save_all(pool: &PgPool, symbols: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     info!("Starting fetch cycle for {} symbols", symbols.len());
 
@@ -83,28 +79,45 @@ async fn fetch_and_save_all(pool: &PgPool, symbols: &[String]) -> Result<(), Box
             }
         }
 
-        println!("Mock price for {}: ${:.2}", symbol, mock_price);
+        info!("Mock price for {}: ${:.2}", symbol, mock_price);
     }
 
     info!("Completed fetch cycle");
     Ok(())
 }
 
-// Main TOKIO
-
+// Main Tokio Runtime
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
-    tracing_subscriber::fmt().with_env_filter("info").init();
+
+    // Initialize structured logging with filtering
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::new("info"))
+        .init();
 
     info!("Starting stock price aggregator...");
 
+    // Database setup
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let pool = PgPoolOptions::new().max_connections(5).connect(&db_url).await?;
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&db_url)
+        .await?;
 
-    let symbols = vec!["AAPL".to_string(), "GOOGL".to_string(), "MSFT".to_string()];
+    info!("Connected to database successfully");
+
+    // Symbols to track
+    let symbols = vec![
+        "AAPL".to_string(),
+        "GOOGL".to_string(),
+        "MSFT".to_string(),
+    ];
+
+    // Run every 60 seconds
     let mut fetch_interval = interval(Duration::from_secs(60));
 
+    // Main loop
     loop {
         tokio::select! {
             _ = fetch_interval.tick() => {
@@ -120,6 +133,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     pool.close().await;
-    info!("Shutdown complete");
+    info!("Shutdown complete. Goodbye!");
     Ok(())
 }
