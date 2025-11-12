@@ -7,10 +7,12 @@
 ---
 
 ---
+
 ## Overview
 This project is part of my Rust programming class (TD01) at ESILV.
 The goal was to build a stock price aggregator that fetches prices from multiple APIs asynchronously using the Tokio runtime.
 The final result is a small yet complete application that connects to real stock APIs, saves the prices every minute, and can shut down gracefully when needed.
+
 ---
 
 ---
@@ -21,6 +23,7 @@ Data persistence with PostgreSQL
 Safe error handling: it keeps running even when one API fails
 Graceful shutdown (using Ctrl + C)
 Clear structured logs
+
 ---
 
 ---
@@ -74,6 +77,7 @@ Press Ctrl + C to stop it safely.
 Ce projet a été réalisé dans le cadre du cours de programmation en Rust (TD01) à l’ESILV.
 L’objectif était de créer un agrégateur de prix d’actions capable de récupérer des données depuis plusieurs APIs de manière asynchrone, en utilisant Tokio, la bibliothèque asynchrone principale de Rust.
 Le résultat final est une application simple mais complète, capable de se connecter à de vraies APIs, d’enregistrer les prix toutes les minutes dans une base PostgreSQL, et de s’arrêter proprement à tout moment.
+
 ---
 
 ---
@@ -84,6 +88,7 @@ Stockage des données dans PostgreSQL
 Gestion des erreurs robuste (le programme continue même si une API échoue)
 Arrêt propre (Ctrl + C)
 Logs clairs et structurés
+
 ---
 
 ---
