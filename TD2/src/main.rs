@@ -1,22 +1,22 @@
 use env_logger::{Builder, Target};
 use futures_util::{SinkExt, StreamExt};
-use log::{LevelFilter, info, error};
+use log::{error, info, LevelFilter};
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::{accept_async, tungstenite::Message};
 
 async fn handle_client(stream: TcpStream) {
     let addr = stream.peer_addr().unwrap();
-    info!("New connection: {}", addr);
+    info!("New connection from {}", addr);
 
-    let ws = match accept_async(stream).await {
+    let ws_stream = match accept_async(stream).await {
         Ok(ws) => ws,
-        Err(err) => {
-            error!("Handshake failed: {}", err);
+        Err(e) => {
+            error!("WebSocket handshake failed: {}", e);
             return;
         }
     };
 
-    let (mut write, mut read) = ws.split();
+    let (mut write, mut read) = ws_stream.split();
 
     while let Some(msg) = read.next().await {
         match msg {
@@ -28,20 +28,24 @@ async fn handle_client(stream: TcpStream) {
                 info!("Client disconnected: {}", addr);
                 break;
             }
-            Err(e) => error!("Error from {}: {}", addr, e),
+            Err(e) => {
+                error!("Error: {}", e);
+                break;
+            }
             _ => {}
         }
     }
-
-    info!("Connection closed: {}", addr);
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    Builder::new().target(Target::Stdout).filter_level(LevelFilter::Info).init();
+    Builder::new()
+        .target(Target::Stdout)
+        .filter_level(LevelFilter::Info)
+        .init();
 
     let listener = TcpListener::bind("127.0.0.1:8080").await?;
-    info!("WebSocket running on ws://127.0.0.1:8080");
+    info!("WebSocket server running on ws://127.0.0.1:8080");
 
     while let Ok((stream, _)) = listener.accept().await {
         tokio::spawn(handle_client(stream));
