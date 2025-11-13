@@ -46,8 +46,8 @@ TD1_2_Rust_Tokio/
 ## How to run the project
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Jenniferachkar/TD01_Rust_Async-Workshop-with-Tokio.git
-cd TD01_Rust_Async-Workshop-with-Tokio
+cd TD1_2_Rust_Tokio
+git clone https://github.com/Jenniferachkar/TD1_2_Rust_Tokio
 ```
 ### 2. Set up the database
 ```bash
