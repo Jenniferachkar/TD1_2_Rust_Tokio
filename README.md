@@ -41,6 +41,7 @@ TD1_2_Rust_Tokio/
 ```bash
 cd TD1_2_Rust_Tokio
 git clone https://github.com/Jenniferachkar/TD1_2_Rust_Tokio
+cargo check
 cargo build
 ```
 ### 2. Set up the database
