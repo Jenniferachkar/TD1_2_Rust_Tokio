@@ -1,79 +1,105 @@
-# TD01_Rust_Async-Workshop-with-Tokio & TD_02_Rust_WebSocket_Workshop_with_Tokio
-### by Jennifer El Achkar ESILV A4
+# TD01 – Rust Async Workshop with Tokio  
+# TD02 – Rust WebSocket Workshop with Tokio  
+### by Jennifer El Achkar — ESILV A4 (FinTech)
 
 ## Overview
-This repository contains two complete Rust workshops built with Tokio, covering:
+This repository contains two full Rust workshops built using Tokio. They cover:
 
-TD1: Async Programming & Database Integration
-TD2: WebSockets, Broadcasting & Real-Time Dashboard
+- **TD1 — Asynchronous Programming & API Aggregation**
+  - Async tasks with Tokio
+  - Calling multiple APIs concurrently (Alpha Vantage, Finnhub, mock API)
+  - Safe error handling (system stays alive if one API fails)
+  - Database persistence (PostgreSQL)
+  - Graceful shutdown with Ctrl + C
+  - Structured and timestamped logs
+
+- **TD2 — Real-Time WebSocket Dashboard**
+  - WebSocket server built with Tokio
+  - Real-time broadcasting
+  - Interactive dashboard (HTML + JS)
+  - Stable async architecture
 
 ## Features
-Multiple APIs (Alpha Vantage, Finnhub, and a mock)
-Full async design using Tokio
-Data persistence with PostgreSQL
-Safe error handling: it keeps running even when one API fails
-Graceful shutdown (using Ctrl + C)
-Clear structured logs
+ Fully asynchronous architecture (Tokio runtime)  
+ Multiple API sources aggregated concurrently  
+ Automatic retries + error resilience  
+ PostgreSQL storage with SQL schema  
+ Configurable through `.env`  
+ WebSocket server for live message broadcasting  
+ Clean project structure and logs  
 
 ## Project Structure
-```css
+```
 TD1_2_Rust_Tokio/
 │
 ├── TD1/
 │   ├── Cargo.toml
-│   ├── rust-1.md          
+│   ├── rust-1.md
 │   └── src/
-│       └── main.rs        
+│       └── main.rs
 │
 ├── TD2/
 │   ├── Cargo.toml
-│   ├── rust-2.md          
+│   ├── rust-2.md
 │   └── src/
-│       └── main.rs        
+│       └── main.rs
 │
-├── schema.sql             
-├── README.md              
-└── Cargo.toml             
+├── schema.sql
+├── README.md
+└── Cargo.toml
 ```
 
-## How to run the project
-### 1. Clone the repository
-```bash
-cd TD1_2_Rust_Tokio
-git clone https://github.com/Jenniferachkar/TD1_2_Rust_Tokio
-cargo check
-cargo build
-```
-### 2. Set up the database
-```bash
-createdb stockdb
-psql -U postgres -d stockdb -f schema.sql
-```
-### 3. I Created a '.env' file at the root project
-```ini
-ALPHA_VANTAGE_KEY=your_api_key
-FINNHUB_KEY=your_api_key
-DATABASE_URL=postgresql://user:password@localhost/stockdb
-```
-### 4. Run the TD1
-```bash
-cd TD1
-cargo run
-```
-Once launched, the program will:
-  Fetch stock prices every minute
-  Store results in PostgreSQL
-  Display structured logs in the terminal
-Press Ctrl + C to stop it safely.
+## How to Run the Project
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Jenniferachkar/TD1_2_Rust_Tokio
+   cd TD1_2_Rust_Tokio
+   cargo check
+   cargo build
+   ```
 
-### 5. Run the TD2
-```bash
-cd TD2
-cargo run
-```
-Open the included HTML file: dashboard.html
+2. **Set up the PostgreSQL database**
+   Create the database:
+   ```bash
+   createdb stockdb
+   ```
+   Import the schema:
+   ```bash
+   psql -U postgres -d stockdb -f schema.sql
+   ```
 
-How to test : Create a file test.html
+3. **Create a `.env` file at the project root**
+   ```ini
+   ALPHA_VANTAGE_KEY=your_api_key
+   FINNHUB_KEY=your_api_key
+   DATABASE_URL=postgresql://user:password@localhost/stockdb
+   ```
+
+4. **TD1 — Run the Async Stock Aggregator**
+   ```bash
+   cd TD1
+   cargo run
+   ```
+   Once launched, the program will:
+   - Fetch stock prices every minute
+   - Store the data into PostgreSQL
+   - Display live structured logs
+   - Continue running even if one API fails  
+   Stop safely using Ctrl + C
+
+5. **TD2 — Run the WebSocket Server**
+   ```bash
+   cd TD2
+   cargo run
+   ```
+   Then open:
+   ```
+   dashboard.html
+   ```
+   This page will connect to the WebSocket server and display messages.
+
+## How to Test the WebSocket
+Create a file named `test.html`:
 ```html
 <!DOCTYPE html>
 <html>
@@ -86,4 +112,7 @@ ws.onmessage = (e) => console.log("Received:", e.data);
 </body>
 </html>
 ```
-Open it in Chrome, open DevTools (F12), Console.
+Open it in Chrome → F12 → Console. You should see:
+```
+Received: Hello Nathan c'est Jenny
+```
