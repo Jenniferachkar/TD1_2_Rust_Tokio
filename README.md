@@ -1,6 +1,6 @@
 # TD01 – Rust Async Workshop with Tokio  
 # TD02 – Rust WebSocket Workshop with Tokio  
-### by Jennifer El Achkar — ESILV A4 (FinTech)
+### by Jennifer El Achkar ESILV A4 (FinTech)
 
 ## Overview
 This repository contains two full Rust workshops built using Tokio. They cover:
